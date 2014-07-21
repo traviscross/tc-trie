@@ -2,16 +2,53 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/mman.h>
 #include "trie.h"
+#include "cJSON.h"
+
+cJSON* parse_file(char *file) {
+  char *buf;
+  struct stat s;
+  int fd = open(file, O_RDONLY);
+  if (fd < 0) return NULL;
+  fstat(fd, &s);
+  buf = mmap(0, s.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
+  close(fd);
+  if (buf == MAP_FAILED) return NULL;
+  cJSON *root = cJSON_Parse(buf);
+  if (munmap(buf, s.st_size) < 0) abort();
+  return root;
+}
+
+struct bit_trie_node *load_file(char *file) {
+  cJSON *root = parse_file(file);
+  if (!root) return NULL;
+  struct bit_trie_node *node = bit_trie_create();
+  cJSON *item = root->child;
+  while(item) {
+    if (item->string && item->valuestring) {
+      bit_trie_set(node, (unsigned char*)item->string, strlen(item->string),
+                   strdup(item->valuestring), strlen(item->valuestring)+1);
+    }
+    item = item->next;
+  }
+  cJSON_Delete(root);
+  return node;
+}
 
 int main(int argc, char **argv) {
-  struct bit_trie_node *node = bit_trie_create();
+  if (argc < 3) {
+    fprintf(stderr, "usage: %s <data.json> <string>\n", argv[0]);
+  }
+  char *file = argv[1];
+  char *target = argv[2];
   struct bit_trie_node *res = NULL;
-  bit_trie_set(node, (unsigned char*)"01234", 5, strdup("test-01234"), 11);
-  bit_trie_set(node, (unsigned char*)"012345", 6, strdup("test-012345"), 12);
-  bit_trie_set(node, (unsigned char*)"012346", 6, strdup("test-012346"), 12);
-  bit_trie_set(node, (unsigned char*)"01243", 5, strdup("test-01243"), 11);
-  uint32_t len = bit_trie_get(&res, node, (unsigned char*)"01234", 5);
+  struct bit_trie_node *node = load_file(file);
+  uint32_t len = bit_trie_get(&res, node, (unsigned char*)target, strlen(target));
   if (len > 0 && res && res->value) {
     printf("Result: %s, Len: %d\n", (unsigned char*)res->value, len);
   } else if (len > 0 && res) {

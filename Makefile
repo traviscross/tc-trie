@@ -35,6 +35,6 @@ trie.a: trie.o Makefile
 trie-asan.a: trie.asan.o Makefile
 	ar crs $@ trie.asan.o
 
-test: test.c trie-asan.a Makefile
-	$(CC) $(CFLAGS_ASAN) -fPIE -pie -o $@ $< trie-asan.a
+test: test.c trie-asan.a cJSON.asan.o Makefile
+	$(CC) $(CFLAGS_ASAN) -fPIE -pie -lm -o $@ $< trie-asan.a cJSON.asan.o
 	./test.sh
