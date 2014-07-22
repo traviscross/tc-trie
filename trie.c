@@ -81,14 +81,17 @@ struct bit_trie_node* bit_trie_set(struct bit_trie_node *node,
   return node;
 }
 
-static void bit_trie_free_r(struct bit_trie_node *node) {
-  if (!node) return;
-  bit_trie_free_r(node->next[0]);
-  bit_trie_free_r(node->next[1]);
+static uint32_t bit_trie_free_r(struct bit_trie_node *node) {
+  uint32_t count = 0;
+  if (!node) return count;
+  count += bit_trie_free_r(node->next[0]);
+  count += bit_trie_free_r(node->next[1]);
   free(node->value);
   free(node);
+  count++;
+  return count;
 }
 
-void bit_trie_free(struct bit_trie_node *node) {
+uint32_t bit_trie_free(struct bit_trie_node *node) {
   return bit_trie_free_r(node);
 }
