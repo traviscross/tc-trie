@@ -39,13 +39,14 @@ uint32_t bit_trie_get(struct bit_trie_node **node_out,
   unsigned char *keyp = key;
   while(keyp < key + key_len) {
     uint8_t offset = 0;
+    struct bit_trie_node *node0 = node;
     while(offset < 8) {
       uint8_t bit = (*keyp >> offset) & 0x01;
       struct bit_trie_node *next = node->next[bit];
       if (next) {
         node = next;
       } else {
-        *node_out = node;
+        *node_out = node0;
         return keyp - key;
       }
       offset++;
