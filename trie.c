@@ -59,7 +59,8 @@ uint32_t bit_trie_get(struct bit_trie_node **node_out,
 struct bit_trie_node* bit_trie_set(struct bit_trie_node *node,
                                    unsigned char *key,
                                    uint32_t key_len,
-                                   void *value) {
+                                   void *value,
+                                   uint32_t value_len) {
   unsigned char *keyp = key;
   while(keyp < key + key_len) {
     uint8_t offset = 0;
@@ -78,6 +79,7 @@ struct bit_trie_node* bit_trie_set(struct bit_trie_node *node,
     keyp++;
   }
   node->value = value;
+  node->value_len = value_len;
   return node;
 }
 
