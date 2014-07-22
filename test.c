@@ -42,13 +42,16 @@ struct bit_trie_node *load_file(char *file) {
 
 int main(int argc, char **argv) {
   if (argc < 3) {
-    fprintf(stderr, "usage: %s <data.json> <string>\n", argv[0]);
+    fprintf(stderr, "usage: %s <data.json> <string> [<times>]\n", argv[0]);
   }
   char *file = argv[1];
   char *target = argv[2];
+  int times = argc >= 4 && atoi(argv[3])>0 ? atoi(argv[3]) : 1;
   struct bit_trie_node *res = NULL;
   struct bit_trie_node *node = load_file(file);
-  uint32_t len = bit_trie_get(&res, node, (unsigned char*)target, strlen(target));
+  uint32_t len, i;
+  for (i=times; i>0; i--)
+    len = bit_trie_get(&res, node, (unsigned char*)target, strlen(target));
   if (len > 0 && res && res->value) {
     printf("Result: %s, Len: %d\n", (unsigned char*)res->value, len);
   } else if (len > 0 && res) {
