@@ -17,7 +17,6 @@ int main(int argc, char **argv) {
   } else if (len > 0 && res) {
     printf("Matched %d chars of key but no leaf value\n", len);
   }
-  int n = bit_trie_free(node);
-  printf("Freed %d nodes\n", n);
+  printf("Freed %d nodes\n", bit_trie_free(node));
   return 0;
 }
