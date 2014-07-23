@@ -37,4 +37,4 @@ struct bit_trie_node* bit_trie_set(struct bit_trie_node *node,
                                    void *value,
                                    uint32_t value_len);
 uint32_t bit_trie_free(struct bit_trie_node *node);
-uint32_t bit_trie_byte_size(struct bit_trie_node *node);
+uint64_t bit_trie_byte_size(struct bit_trie_node *node);

@@ -103,8 +103,8 @@ uint32_t bit_trie_free(struct bit_trie_node *node) {
   return bit_trie_free_r(node);
 }
 
-uint32_t bit_trie_byte_size(struct bit_trie_node *node) {
-  uint32_t size = 0;
+uint64_t bit_trie_byte_size(struct bit_trie_node *node) {
+  uint64_t size = 0;
   if (!node) return size;
   size += bit_trie_byte_size(node->next[0]);
   size += bit_trie_byte_size(node->next[1]);
